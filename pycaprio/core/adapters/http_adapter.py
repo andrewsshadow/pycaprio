@@ -1,6 +1,4 @@
-from typing import IO, Union
-from typing import List
-from typing import Optional
+from typing import IO, Union, List, Optional
 
 from pycaprio.core.clients.retryable_client import RetryableInceptionClient
 from pycaprio.core.interfaces.adapter import BaseInceptionAdapter
@@ -30,8 +28,12 @@ class HttpInceptionAdapter(BaseInceptionAdapter):
         inception_host: str,
         authentication: authentication_type,
         inception_client: Optional[BaseInceptionClient] = None,
+        ca_bundle: Optional[str] = None,
+        verify: Union[bool, str] = True,
     ):
-        self.client = inception_client or RetryableInceptionClient(inception_host, authentication)
+        self.client = inception_client or RetryableInceptionClient(
+            inception_host, authentication, ca_bundle=ca_bundle, verify=verify
+        )
         self.default_username, _ = authentication
 
     def projects(self) -> List[Project]:

@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Union
 
 from pycaprio.core.adapters.http_adapter import HttpInceptionAdapter
 from pycaprio.core.exceptions import ConfigurationNotProvided
@@ -17,6 +17,8 @@ class Pycaprio:
         inception_host: Optional[str] = None,
         authentication: Optional[authentication_type] = None,
         local_projects_dir: Optional[str] = None,
+        ca_bundle: Optional[str] = None,
+        verify: Union[bool, str] = True,
     ):
         """
         Initializes Pycaprio in either remote or local mode.
@@ -24,6 +26,11 @@ class Pycaprio:
         :param inception_host: Hostname of the INCEpTION instance.
         :param authentication: Tuple of username and password for INCEpTION instance.
         :param local_projects_dir: Directory containing exported INCEpTION projects in ZIP format.
+        :param ca_bundle: Path to a custom CA certificate file to trust.
+                         This is the recommended way to support self-signed certificates.
+        :param verify: Controls SSL verification behavior:
+                      - True (default): Verify SSL certificates using system CAs + ca_bundle if provided
+                      - False: Disable SSL verification (not recommended for production)
         """
         inception_host = inception_host or os.getenv("INCEPTION_HOST")
         if inception_host:
@@ -33,8 +40,8 @@ class Pycaprio:
                     "Authentication was not provided. "
                     "You can set it via environment variables as 'INCEPTION_USERNAME' and 'INCEPTION_PASSWORD'"
                 )
-            
-            self.api = HttpInceptionAdapter(inception_host, authentication)
+
+            self.api = HttpInceptionAdapter(inception_host, authentication, ca_bundle=ca_bundle, verify=verify)
         elif local_projects_dir:
             self.api = LocalInceptionAdapter(local_projects_dir)
         else:
