@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional, Union
 
 
 class Curation:
@@ -7,7 +8,12 @@ class Curation:
     """
 
     def __init__(
-        self, project_id: int, document_id: int, user_name: str, document_state: str, timestamp: datetime.datetime
+        self,
+        project_id: Union[int, str],
+        document_id: Union[int, str],
+        user_name: str,
+        document_state: str,
+        timestamp: Optional[datetime.datetime],
     ):
         self.project_id = project_id
         self.document_id = document_id

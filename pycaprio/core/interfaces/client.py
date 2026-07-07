@@ -33,21 +33,24 @@ class BaseInceptionClient(metaclass=ABCMeta):
         return f"{self.inception_host}{self.INCEPTION_API_PATH}{relative_url}"
 
     @abstractmethod
-    def get(self, url: str, data: Optional[dict]) -> requests.Response:
+    def get(self, url: str, params: Optional[dict] = None) -> requests.Response:
         """
         Issues an authenticated GET request to Inception
         :param url: relative url to make request
-        :param data: Parameters to include in the request
+        :param params: Query parameters to include in the request
         :return: Response
         """
         pass  # pragma: no cover
 
     @abstractmethod
-    def post(self, url: str, json: dict, files: dict) -> requests.Response:
+    def post(
+        self, url: str, data: Optional[dict] = None, form_data: Optional[dict] = None, files: Optional[dict] = None
+    ) -> requests.Response:
         """
         Issues an authenticated POST request to Inception
         :param url: relative url to make request
-        :param json: JSON body
+        :param data: Form-encoded body fields
+        :param form_data: Multipart form fields
         :param files: Files to be uploaded.
         :return: Response
         """

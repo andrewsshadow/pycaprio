@@ -24,7 +24,7 @@ class LocalInceptionAdapter(BaseInceptionAdapter):
         """
         self.local_projects_dir = local_projects_dir
 
-    def _get_project_zip_path(self, project_id: str) -> str:
+    def _get_project_zip_path(self, project_id: Union[int, str]) -> str:
         """
         Finds the ZIP file associated with a given project ID.
 
@@ -58,13 +58,13 @@ class LocalInceptionAdapter(BaseInceptionAdapter):
 
         return projects
 
-    def project(self, project: Union[Project, str]) -> Project:
+    def project(self, project: Union[Project, int, str]) -> Project:
         """
         Returns a project (metadata).
 
         :param project: Project object or project ID. (Project ID is the filename of the exported project ZIP file.)
         """
-        project_id = project if isinstance(project, str) else project.project_id
+        project_id = project.project_id if isinstance(project, Project) else project
         zip_path = self._get_project_zip_path(project_id)
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             with zip_ref.open("exportedproject.json") as json_file:
@@ -73,13 +73,13 @@ class LocalInceptionAdapter(BaseInceptionAdapter):
                     project_id=project_id, project_name=project_data["slug"], project_title=project_data["name"]
                 )
 
-    def documents(self, project: Union[Project, str]) -> List[str]:
+    def documents(self, project: Union[Project, int, str]) -> List[Document]:
         """
         Returns a list of all available documents in the project.
 
         :param project: Project object or project ID. (Project ID is the filename of the exported project ZIP file.)
         """
-        project_id = project if isinstance(project, str) else project.project_id
+        project_id = project.project_id if isinstance(project, Project) else project
         zip_path = self._get_project_zip_path(project_id)
         document_list = []
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
@@ -97,7 +97,7 @@ class LocalInceptionAdapter(BaseInceptionAdapter):
 
         return document_list
 
-    def document(self, project: Union[Project, str], document: Union[Document, str]) -> bytes:
+    def document(self, project: Union[Project, int, str], document: Union[Document, int, str]) -> bytes:
         """
         Returns the content of a document.
 
@@ -105,22 +105,22 @@ class LocalInceptionAdapter(BaseInceptionAdapter):
         :param document: Document object or document ID. (Document ID is the filename of the document in the ZIP file.)
         """
 
-        project_id = project if isinstance(project, str) else project.project_id
-        document_id = document if isinstance(document, str) else document.document_id
+        project_id = project.project_id if isinstance(project, Project) else project
+        document_id = document.document_id if isinstance(document, Document) else document
         zip_path = self._get_project_zip_path(project_id)
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             with zip_ref.open(f"source/{document_id}") as document_file:
                 return document_file.read()
 
-    def annotations(self, project: Union[Project, str], document: Union[Document, str]) -> List[Annotation]:
+    def annotations(self, project: Union[Project, int, str], document: Union[Document, int, str]) -> List[Annotation]:
         """
         Returns a list of all annotations for a document.
 
         :param project: Project object or project ID. (Project ID is the filename of the exported project ZIP file.)
         :param document: Document object or document ID. (Document ID is the filename of the document in the ZIP file.)
         """
-        project_id = project if isinstance(project, str) else project.project_id
-        document_id = document if isinstance(document, str) else document.document_id
+        project_id = project.project_id if isinstance(project, Project) else project
+        document_id = document.document_id if isinstance(document, Document) else document
         zip_path = self._get_project_zip_path(project_id)
         annotation_list = []
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
@@ -142,7 +142,7 @@ class LocalInceptionAdapter(BaseInceptionAdapter):
 
         return annotation_list
 
-    def annotation(self, project: Union[Project, str], document: Union[Document, str], user_name: str) -> bytes:
+    def annotation(self, project: Union[Project, int, str], document: Union[Document, int, str], user_name: str) -> bytes:
         """
         Returns the content of an annotation.
         NOTE: Returns the annotation in JSON CAS format only.
@@ -152,8 +152,8 @@ class LocalInceptionAdapter(BaseInceptionAdapter):
         :param user_name: User name of the annotator.
         """
 
-        project_id = project if isinstance(project, str) else project.project_id
-        document_id = document if isinstance(document, str) else document.document_id
+        project_id = project.project_id if isinstance(project, Project) else project
+        document_id = document.document_id if isinstance(document, Document) else document
         zip_path = self._get_project_zip_path(project_id)
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             with zip_ref.open(f"annotation/{document_id}/{user_name}.json") as document_file:
