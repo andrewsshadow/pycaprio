@@ -199,7 +199,7 @@ class HttpInceptionAdapter(BaseInceptionAdapter):
         project: Union[Project, int, str],
         document: Union[Document, int, str],
         content: IO,
-        document_state: str = DocumentState.DEFAULT,
+        document_state: str = DocumentState.CURATION_IN_PROGRESS,
         curation_format: str = InceptionFormat.DEFAULT,
     ) -> Curation:
         project_id = self._get_object_id(project)
@@ -207,7 +207,7 @@ class HttpInceptionAdapter(BaseInceptionAdapter):
         response = self.client.post(
             f"/projects/{project_id}/documents/{document_id}/curation",
             form_data={"format": curation_format, "state": document_state},
-            files={"content": content},
+            files={"content": ("data", content)},
         )
         curation = CurationSchema().load(response.json()["body"], many=False)
         curation.project_id = project_id

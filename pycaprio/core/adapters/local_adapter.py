@@ -202,7 +202,12 @@ class LocalInceptionAdapter(BaseInceptionAdapter):
         raise NotImplementedError
 
     def create_curation(
-        self, project, document, content, document_state=DocumentState.DEFAULT, curation_format=InceptionFormat.DEFAULT
+        self,
+        project,
+        document,
+        content,
+        document_state=DocumentState.CURATION_IN_PROGRESS,
+        curation_format=InceptionFormat.DEFAULT,
     ):
         raise NotImplementedError
 

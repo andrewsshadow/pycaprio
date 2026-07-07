@@ -202,7 +202,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         project: Union[Project, int, str],
         document: Union[Document, int, str],
         content: IO,
-        document_state: str = DocumentState.DEFAULT,
+        document_state: str = DocumentState.CURATION_IN_PROGRESS,
         curation_format: str = InceptionFormat.DEFAULT,
     ) -> Curation:
         """
