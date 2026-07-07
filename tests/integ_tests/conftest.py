@@ -5,7 +5,6 @@ import time
 import pytest
 import requests
 import bcrypt
-import shlex
 from testcontainers.core.container import DockerContainer
 from pycaprio import Pycaprio
 import docker

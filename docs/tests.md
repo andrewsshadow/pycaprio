@@ -2,7 +2,7 @@
 
 To be able to run the tests you must execute from your already cloned repo's root:
 ```
-make tests
+uv run task test
 ```
 
 ### Quality Assurance
@@ -10,8 +10,8 @@ make tests
 The following quality checks are in place:
 
 * 90% branch coverage
-* `pycaprio` passes flake8
-* Tests also pass flake8
+* `pycaprio` passes ruff
+* Tests also pass ruff
 
 Current coverage is [![codecov](https://codecov.io/gh/Savanamed/Pycaprio/branch/master/graph/badge.svg)](https://codecov.io/gh/Savanamed/Pycaprio)
 
