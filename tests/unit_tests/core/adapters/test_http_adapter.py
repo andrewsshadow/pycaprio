@@ -407,6 +407,27 @@ def test_curation_has_document_id_injected_creation(
 
 
 @pytest.mark.parametrize(
+    "function, params, resource",
+    [
+        (HttpInceptionAdapter.create_document, (1, "test-name"), "document"),
+        (HttpInceptionAdapter.create_annotation, (1, 1, "test-user"), "annotation"),
+        (HttpInceptionAdapter.create_curation, (1, 1), "curation"),
+    ],
+)
+def test_content_upload_passes_content_as_named_file_tuple(
+    function, params, resource, mock_http_adapter: HttpInceptionAdapter, mock_http_response: Mock, serializations: dict, mock_io: IO
+):
+    # The client's _request unpacks every files value as a (name, stream) tuple, so all content
+    # uploads must pass files={"content": (name, stream)} rather than a bare stream.
+    mock_http_response.json.return_value = {"body": serializations[resource]}
+    mock_http_adapter.client.post.return_value = mock_http_response
+    function(mock_http_adapter, *params, mock_io)
+    content = mock_http_adapter.client.post.call_args.kwargs["files"]["content"]
+    _, stream = content
+    assert stream is mock_io
+
+
+@pytest.mark.parametrize(
     "value, expected_value",
     [
         (1, 1),
