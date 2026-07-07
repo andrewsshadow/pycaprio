@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 import pytest
 
 from pycaprio.core.clients.retryable_client import RetryableInceptionClient
+from pycaprio.core.clients.retryable_client import SSLAdapter
 from pycaprio.core.exceptions import InceptionBadResponse
 from pycaprio.core.interfaces.types import authentication_type
 
@@ -79,3 +80,42 @@ def test_client_request_returns_inception_bad_request_if_already_retried(
     mocker.patch("time.sleep")
     with pytest.raises(InceptionBadResponse):
         client.request(http_verb, "")
+
+
+def test_client_verifies_ssl_by_default(mock_host: str, mock_authentication: authentication_type):
+    client = RetryableInceptionClient(mock_host, mock_authentication)
+    assert client.session.verify is True
+
+
+def test_client_verify_false_disables_verification(mock_host: str, mock_authentication: authentication_type):
+    client = RetryableInceptionClient(mock_host, mock_authentication, verify=False)
+    assert client.session.verify is False
+
+
+def test_client_verify_string_is_used_as_ca_bundle_path(mock_host: str, mock_authentication: authentication_type):
+    # A string verify is a path to a CA bundle and must be passed through to requests as-is,
+    # not silently treated as "disable verification".
+    client = RetryableInceptionClient(mock_host, mock_authentication, verify="/path/to/ca.pem")
+    assert client.session.verify == "/path/to/ca.pem"
+
+
+def test_client_ca_bundle_mounts_ssl_adapter(mocker, mock_host, mock_authentication, tmp_path):
+    ca_bundle = tmp_path / "ca.pem"
+    ca_bundle.write_text("dummy")
+    # Avoid parsing the dummy CA file; we only care that the adapter gets mounted.
+    mocker.patch("pycaprio.core.clients.retryable_client.create_urllib3_context", return_value=Mock())
+    client = RetryableInceptionClient(mock_host, mock_authentication, ca_bundle=str(ca_bundle))
+    assert isinstance(client.session.get_adapter("https://example.com"), SSLAdapter)
+
+
+def test_client_ca_bundle_not_mounted_when_verification_disabled(mock_host, mock_authentication, tmp_path):
+    ca_bundle = tmp_path / "ca.pem"
+    ca_bundle.write_text("dummy")
+    client = RetryableInceptionClient(mock_host, mock_authentication, ca_bundle=str(ca_bundle), verify=False)
+    assert not isinstance(client.session.get_adapter("https://example.com"), SSLAdapter)
+
+
+def test_client_missing_ca_bundle_raises(mock_host, mock_authentication, tmp_path):
+    missing = tmp_path / "does-not-exist.pem"
+    with pytest.raises(ValueError):
+        RetryableInceptionClient(mock_host, mock_authentication, ca_bundle=str(missing))

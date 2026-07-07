@@ -26,9 +26,10 @@ class SSLAdapter(HTTPAdapter):
     def init_poolmanager(self, *args, **kwargs):
         """Initialize pool manager with custom SSL context that includes custom CA certificates."""
         if self.ca_bundle:
-            # Create a default SSL context
             ctx = create_urllib3_context()
-            # Load both system CAs and custom CAs
+            # Load the system default CAs first, then add the custom CA bundle on top so that
+            # both system-trusted and custom/self-signed certificates are trusted.
+            ctx.load_default_certs()
             ctx.load_verify_locations(cafile=self.ca_bundle)
             kwargs["ssl_context"] = ctx
         return super().init_poolmanager(*args, **kwargs)
@@ -48,7 +49,7 @@ class RetryableInceptionClient(BaseInceptionClient):
         authentication: authentication_type,
         max_retries: int = 3,
         ca_bundle: Optional[str] = None,
-        verify: bool = True,
+        verify: Union[bool, str] = True,
     ):
         super().__init__(inception_host, authentication)
         self.session = requests.Session()
@@ -56,18 +57,16 @@ class RetryableInceptionClient(BaseInceptionClient):
         assert 0 < max_retries, "max_retries must be greater than 0"
         self.max_retries = max_retries
 
-        if verify is True:
-            # If verify is True, use the SSLAdapter
-            self.session.verify = True
-        else:
-            # If verify is False, disable verification
-            self.session.verify = False
+        if ca_bundle is not None and not os.path.isfile(ca_bundle):
+            raise ValueError(f"CA bundle file does not exist or is not a file: {ca_bundle}")
 
-        # Mount custom SSL adapter if we have a custom CA bundle
+        # requests natively accepts verify as a bool or a path to a CA bundle.
+        self.session.verify = verify
+
+        # Mount custom SSL adapter if we have a custom CA bundle and verification is not disabled.
+        # This trusts the custom CA in addition to the system CAs.
         if ca_bundle and verify is not False:
-            adapter = SSLAdapter(ca_bundle=ca_bundle)
-            self.session.mount("https://", adapter)
-            self.session.mount("http://", adapter)
+            self.session.mount("https://", SSLAdapter(ca_bundle=ca_bundle))
 
     def get(self, url: str, params: Optional[dict] = None) -> requests.Response:
         return self.request("get", url, params=params)

@@ -31,6 +31,7 @@ class Pycaprio:
         :param verify: Controls SSL verification behavior:
                       - True (default): Verify SSL certificates using system CAs + ca_bundle if provided
                       - False: Disable SSL verification (not recommended for production)
+                      - str: Path to a CA bundle file to use for verification instead of the system CAs
         """
         inception_host = inception_host or os.getenv("INCEPTION_HOST")
         if inception_host:
