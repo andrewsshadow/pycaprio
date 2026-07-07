@@ -1,9 +1,14 @@
+from typing import Union
+
+
 class Document:
     """
     INCEpTION's Document object
     """
 
-    def __init__(self, project_id: int, document_id: int, document_name: str, document_state: str):
+    def __init__(
+        self, project_id: Union[int, str], document_id: Union[int, str], document_name: str, document_state: str
+    ):
         self.project_id = project_id
         self.document_id = document_id
         self.document_name = document_name

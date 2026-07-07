@@ -1,40 +1,89 @@
-[tool.poetry]
+[build-system]
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
+
+[project]
 name = "pycaprio"
-version = "0.4.0-dev"
-readme = "README.md"
-repository = "https://github.com/inception-project/pycaprio"
-documentation = "https://pycaprio.readthedocs.io"
+version = "0.4.0.dev0"
+requires-python = ">=3.9"
+authors = [
+    { name = "The INCEpTION Project" },
+    { name = "Javier Luna Molina" },
+    { name = "Savanamed" },
+]
+maintainers = [ { name = "Richard Eckart de Castilho" } ]
 description = "Python client for the INCEpTION annotation tool remote API"
-authors = ["The INCEpTION Project", "Javier Luna Molina", "Savanamed"]
-maintainers = [ "Richard Eckart de Castilho" ]
+readme = "README.md"
 license = "MIT"
-packages = [
-    { include = "pycaprio" },
+keywords = []
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "requests>=2.32.3,<3",
+    "requests-toolbelt>=1.0.0,<2",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.32.3"
-requests-toolbelt = "^1.0.0"
+[dependency-groups]
+dev = [
+    "ruff~=0.9.10",
+    "pytest>=8.3.5,<9",
+    "pytest-mock==3.14.0",
+    "requests-mock==1.12.1",
+    "coverage>=7.6.12,<8",
+    "pytest-cov>=6.0.0,<7",
+    "codecov>=2.1.13,<3",
+    "testcontainers>=4.9.2,<5",
+    "bcrypt>=4.3.0,<5",
+    "taskipy",
+    "pyright",
+]
+doc = [
+    "mkdocs>=1.6.1,<2",
+    "Jinja2>=3.1.6,<4",
+]
 
-[tool.poetry.group.dev.dependencies]
-Jinja2 = "^3.1.6"
-ruff = "^0.9.10"
-pytest = "^8.3.5"
-pytest-mock = "3.14.0"
-requests-mock = "1.12.1"
-coverage = "^7.6.12"
-mkdocs = "^1.6.1"
-pytest-cov = "^6.0.0"
-codecov = "^2.1.13"
-bump2version = "^0.5.11"
-testcontainers = "^4.9.2"
-bcrypt = "^4.3.0"
+[project.urls]
+Repository = "https://github.com/inception-project/pycaprio"
+Documentation = "https://pycaprio.readthedocs.io"
+
+[tool.uv.build-backend]
+module-root = ""
+
+[tool.taskipy.tasks]
+unit-tests = "pytest --cov=pycaprio --cov-branch --cov-fail-under=90 --cov-report=xml:unit-coverage.xml tests/unit_tests"
+integ-tests = "pytest -s --cov=pycaprio --cov-branch --cov-fail-under=70 --cov-report=xml:integration-coverage.xml tests/integ_tests"
+test = "task unit-tests && task integ-tests"
+format = "ruff format pycaprio tests"
+lint = "ruff check pycaprio tests"
+typecheck = "pyright pycaprio tests"
+fix = "ruff check --fix pycaprio tests"
+docs = "mkdocs serve"
 
 [tool.ruff]
 line-length = 120
 target-version = "py39"
 
-[build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.ruff.lint]
+# Equivalent to flake8's E9,F63,F7,F82 (syntax errors and undefined names)
+select = [
+    "E9",   # Runtime errors
+    "F63",  # Invalid print syntax
+    "F7",   # Syntax errors in type comments
+    "F82",  # Undefined names in __all__
+    "F",    # Pyflakes (includes undefined names, unused imports, etc.)
+]
+# Equivalent to flake8's --max-complexity=10
+mccabe = { max-complexity = 10 }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

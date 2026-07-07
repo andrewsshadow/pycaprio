@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 
 class Project:
@@ -6,7 +6,7 @@ class Project:
     INCEpTION's Project object
     """
 
-    def __init__(self, project_id: int, project_name: str, project_title: Optional[str] = None):
+    def __init__(self, project_id: Union[int, str], project_name: str, project_title: Optional[str] = None):
         self.project_id = project_id
         self.project_name = project_name
         if project_title is None:

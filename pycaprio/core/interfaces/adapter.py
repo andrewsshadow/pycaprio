@@ -23,7 +23,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def project(self, project: Union[Project, int]) -> Project:
+    def project(self, project: Union[Project, int, str]) -> Project:
         """
         Retrieves a Project
         :param project: Project/Project id
@@ -32,7 +32,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def documents(self, project: Union[Project, int]) -> List[Document]:
+    def documents(self, project: Union[Project, int, str]) -> List[Document]:
         """
         Retrieves a list of Documents of a Project.
         :param project: The project/project id of the Project where the Documents are located
@@ -43,8 +43,8 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
     @abstractmethod
     def document(
         self,
-        project: Union[Project, int],
-        document: Union[Document, int],
+        project: Union[Project, int, str],
+        document: Union[Document, int, str],
         document_format: str = InceptionFormat.DEFAULT,
     ) -> bytes:
         """
@@ -57,7 +57,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def annotations(self, project: Union[Project, int], document: Union[Document, int]) -> List[Annotation]:
+    def annotations(self, project: Union[Project, int, str], document: Union[Document, int, str]) -> List[Annotation]:
         """
         Retrieves a list of Annotations of a Document in a Project.
         :param project: The project/project id of the Project where the Annotations are located
@@ -69,9 +69,9 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
     @abstractmethod
     def annotation(
         self,
-        project: Union[Project, int],
-        document: Union[Document, int],
-        annotation: Union[int, Annotation],
+        project: Union[Project, int, str],
+        document: Union[Document, int, str],
+        annotation: Union[int, str, Annotation],
         annotation_format: str = InceptionFormat.DEFAULT,
     ) -> bytes:
         """
@@ -98,7 +98,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
     @abstractmethod
     def create_document(
         self,
-        project: Union[Project, int],
+        project: Union[Project, int, str],
         document_name: str,
         content: IO,
         document_format: str = InceptionFormat.DEFAULT,
@@ -118,8 +118,8 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
     @abstractmethod
     def create_annotation(
         self,
-        project: Union[Project, int],
-        document: Union[Document, int],
+        project: Union[Project, int, str],
+        document: Union[Document, int, str],
         user_name: str,
         content: IO,
         annotation_format: str = InceptionFormat.DEFAULT,
@@ -139,7 +139,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
 
     @abstractmethod
     def update_annotation_state(
-        self, project: Union[Project, int], document: Union[Document, int], user_name: str, annotation_state: str
+        self, project: Union[Project, int, str], document: Union[Document, int, str], user_name: str, annotation_state: str
     ) -> bool:
         """
         Updates the state of an annotation
@@ -151,7 +151,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def delete_project(self, project: Union[Project, int]) -> bool:
+    def delete_project(self, project: Union[Project, int, str]) -> bool:
         """
         Deletes Project.
         :param project: Project/Project id.
@@ -159,7 +159,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def delete_document(self, project: Union[Project, int], document: Union[Document, int]) -> bool:
+    def delete_document(self, project: Union[Project, int, str], document: Union[Document, int, str]) -> bool:
         """
         Deletes Document from a Project.
         :param project: Project/Project id.
@@ -168,7 +168,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def delete_annotation(self, project: Union[Project, int], document: Union[Document, int], user_name: str) -> bool:
+    def delete_annotation(self, project: Union[Project, int, str], document: Union[Document, int, str], user_name: str) -> bool:
         """
         Deletes an Annotation from a Document in a Project
         :param user_name: Annotator's username.
@@ -178,7 +178,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def export_project(self, project: Union[Project, int], project_format: str = InceptionFormat.DEFAULT) -> bytes:
+    def export_project(self, project: Union[Project, int, str], project_format: str = InceptionFormat.DEFAULT) -> bytes:
         """
         Exports a Project into a .zip file.
         :param project: Project/Project id.
@@ -199,10 +199,10 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
     @abstractmethod
     def create_curation(
         self,
-        project: Union[Project, int],
-        document: Union[Document, int],
+        project: Union[Project, int, str],
+        document: Union[Document, int, str],
         content: IO,
-        document_state: str = DocumentState.DEFAULT,
+        document_state: str = DocumentState.CURATION_IN_PROGRESS,
         curation_format: str = InceptionFormat.DEFAULT,
     ) -> Curation:
         """
@@ -217,7 +217,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def curations(self, project: Union[Project, int], document_state: str = InceptionFormat.DEFAULT) -> List[Document]:
+    def curations(self, project: Union[Project, int, str], document_state: str = InceptionFormat.DEFAULT) -> List[Document]:
         """
         Returns a list of curated documents
         :param project: Project/Project id.
@@ -229,8 +229,8 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
     @abstractmethod
     def curation(
         self,
-        project: Union[Project, int],
-        document: Union[Document, int],
+        project: Union[Project, int, str],
+        document: Union[Document, int, str],
         curation_format: str = InceptionFormat.DEFAULT,
     ) -> bytes:
         """
@@ -243,7 +243,7 @@ class BaseInceptionAdapter(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def delete_curation(self, project: Union[Project, int], document: Union[Document, int]) -> bool:
+    def delete_curation(self, project: Union[Project, int, str], document: Union[Document, int, str]) -> bool:
         """
         Deletes curated annotations for a document in a Project
         :param document: Document/Id of the Document in Curation.
