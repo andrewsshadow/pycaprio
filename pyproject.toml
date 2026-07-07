@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
 
 [project]
 name = "pycaprio"
@@ -56,8 +56,8 @@ doc = [
 Repository = "https://github.com/inception-project/pycaprio"
 Documentation = "https://pycaprio.readthedocs.io"
 
-[tool.setuptools.packages.find]
-include = ["pycaprio*"]
+[tool.uv.build-backend]
+module-root = ""
 
 [tool.taskipy.tasks]
 unit-tests = "pytest --cov=pycaprio --cov-branch --cov-fail-under=90 --cov-report=xml:unit-coverage.xml tests/unit_tests"
